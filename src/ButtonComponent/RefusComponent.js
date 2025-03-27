@@ -14,7 +14,7 @@ export default function Refus({ comment, setError ,numeroMessage}) {
 
   const [status, setStatus] = React.useState(null);
   const navigate = useNavigate();
-  const { refetch, loading } = useFetchData(`/refuser/${numeroMessage}/${encodeURIComponent(comment)}`);
+  const { refetch, loading } = useFetchData(`/titles/refuser/${numeroMessage}/${encodeURIComponent(comment)}`);
 
   const handleClick = () => {
     if (!comment || comment.trim() === '') {

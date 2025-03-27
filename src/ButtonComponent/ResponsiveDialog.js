@@ -11,7 +11,7 @@ import { useFetchData } from '../DataFetch/FetchData';
 import { useNavigate } from 'react-router-dom'; // Ajout de cet import
 
 export default function ResponsiveDialog({numeroMessage}) {
-  const { refetch, loading } = useFetchData(`/accepter/${numeroMessage}`);
+  const { refetch, loading } = useFetchData(`/titles/accepter/${numeroMessage}`);
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = React.useState(null);
   const navigate = useNavigate(); // Initialisation du hook pour la navigation

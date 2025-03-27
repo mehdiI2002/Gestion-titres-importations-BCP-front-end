@@ -25,7 +25,7 @@ export const useFetchData = (endpoint) => {
       const contentType = response.headers.get("content-type");
       
       // Si le endpoint commence par /accepter, c'est une action sans retour de données
-      if (endpoint.startsWith('/accepter/')) {
+      if (endpoint.startsWith('/titles/accepter/')) {
         console.log('Action exécutée avec succès');
         setData({ success: true });
       } else if (contentType && contentType.includes("application/json")) {

@@ -12,7 +12,7 @@ import NavBarV2 from '../HeadOfPage/NavBarV2';
 
 export default function PageTwo() {
     const { id, numeroMessage } = useParams();
-    const fetchData = useFetchData(`/detailTitle/${id}/${numeroMessage}`);
+    const fetchData = useFetchData(`/titles/detailTitle/${id}/${numeroMessage}`);
     useEffect(() => {
         fetchData.refetch();
       }, []);

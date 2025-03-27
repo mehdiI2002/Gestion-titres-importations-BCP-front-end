@@ -20,7 +20,7 @@ export function PDF({ useFetch }) {
     try {
       const sanitizedFilePath = filePath.replace(/\\/g, '/');  
     
-    const response = await fetch(`http://localhost:8089/downloadPdf?filePath=${encodeURIComponent(sanitizedFilePath)}`, {
+    const response = await fetch(`http://localhost:8089/titles/downloadPdf?filePath=${encodeURIComponent(sanitizedFilePath)}`, {
       method: 'GET',
       });
 
