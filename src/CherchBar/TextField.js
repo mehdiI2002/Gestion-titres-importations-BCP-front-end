@@ -14,6 +14,7 @@ export default function TextFieldBar({ onSearchResults }) {
     const [searchBy, setSearchBy] = useState('numeroEnregistrement');
     const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const isSearchInProgress = useRef(false);
 
     const handleChange = (event) => {
@@ -38,11 +39,21 @@ export default function TextFieldBar({ onSearchResults }) {
             }
             return;
         }
-
         try {
             // Marquer la recherche comme en cours
             isSearchInProgress.current = true;
             setLoading(true);
+            setError('');
+
+            // Récupérer le token d'authentification
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            
+            if (!token) {
+                console.warn('Aucun token d\'authentification trouvé pour la requête');
+                // Option: rediriger vers la page de connexion si nécessaire
+                // window.location.href = '/auth';
+                // return;
+            }
 
             // Construire l'endpoint selon le critère sélectionné
             let endpoint;
@@ -52,11 +63,36 @@ export default function TextFieldBar({ onSearchResults }) {
                 endpoint = `/researchByRibBancaire/${searchValue}`;
             }
 
-            // Utiliser fetch pour appeler l'API
-            const fullEndpoint = `http://localhost:8089${endpoint}`;
+            // Utiliser fetch pour appeler l'API avec le token dans les headers
+            const fullEndpoint = `http://localhost:8888/titles${endpoint}`;
             console.log("Envoi d'une seule requête à:", fullEndpoint);
             
-            const response = await fetch(fullEndpoint);
+            // Créer les options de la requête avec le token
+            const requestOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            // Ajouter le token d'authentification à l'en-tête si disponible
+            if (token) {
+                requestOptions.headers.Authorization = `Bearer ${token}`;
+                console.log('Token d\'authentification ajouté à la requête');
+            }
+            
+            const response = await fetch(fullEndpoint, requestOptions);
+            
+            // Vérifier si la réponse est une erreur d'authentification
+            if (response.status === 401 || response.status === 403) {
+                console.error('Erreur d\'authentification:', response.status);
+                setError('Session expirée ou non autorisée. Veuillez vous reconnecter.');
+                // Option: rediriger vers la page de connexion
+                // window.location.href = '/auth';
+                onSearchResults([]);
+                return;
+            }
+            
             const result = await response.json();
             console.log("Requête terminée : ", result);
             
@@ -65,10 +101,12 @@ export default function TextFieldBar({ onSearchResults }) {
                 onSearchResults(result || []); // Assurez-vous que result est transmis correctement
             } else {
                 console.error("Erreur de recherche:", result);
+                setError(result.message || 'Une erreur est survenue lors de la recherche');
                 onSearchResults([]);
             }
         } catch (err) {
             console.error("Erreur de recherche:", err);
+            setError('Erreur de connexion au serveur');
             onSearchResults([]);
         } finally {
             setLoading(false);
@@ -123,6 +161,8 @@ export default function TextFieldBar({ onSearchResults }) {
                     value={searchValue}
                     onChange={handleSearchChange}
                     disabled={loading}
+                    error={!!error}
+                    helperText={error}
                     sx={{ 
                         '& .MuiOutlinedInput-root': {
                             '&:hover fieldset': { borderColor: '#e67900' },

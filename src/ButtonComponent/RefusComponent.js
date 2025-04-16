@@ -40,7 +40,7 @@ export default function Refus({ comment, setError ,numeroMessage}) {
   const handleClose = () => {
     setOpen(false);
     if (status === 'success') {
-      navigate('/');
+      navigate('/selectTitles');
     }
   };
 

@@ -38,7 +38,7 @@ export default function ResponsiveDialog({numeroMessage}) {
   const handleClose = () => {
     setOpen(false);
     // Redirection vers la page des titres
-    navigate('/'); // Ajustez ce chemin selon votre structure de routes
+    navigate('/selectTitles'); // Ajustez ce chemin selon votre structure de routes
   };
   return (
     <React.Fragment>
