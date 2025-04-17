@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect ,useRef} from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -18,6 +18,8 @@ export default function ColumnGroupingTable({ searchResults }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { data: fetchedData, loading, error, refetch } = useFetchData('/titles/selectTittles');
   const navigate = useNavigate();
+  const eventSourceRef = useRef(null);
+  const refetchTimeoutRef = useRef(null);
   
   // Réinitialiser la pagination quand les résultats changent
   useEffect(() => {
@@ -25,12 +27,67 @@ export default function ColumnGroupingTable({ searchResults }) {
   }, [searchResults]);
 
   useEffect(() => {
-    // Toujours charger les données au démarrage
+    // Charger les données au démarrage
     refetch();
-  }, []);
+    
+    // Fonction pour créer et configurer la connexion SSE
+    const setupSSE = () => {
+      // Fermer toute connexion existante
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+      
+      // Créer une connexion SSE
+      const eventSource = new EventSource('http://localhost:8888/sse/files');
+      eventSourceRef.current = eventSource;
+      
+      // Écouter les événements
+      eventSource.onmessage = (event) => {
+        console.log('un titre est ajoute au tableau', event.data);
+        
+        // Annuler tout refetch précédent en attente
+        if (refetchTimeoutRef.current) {
+          clearTimeout(refetchTimeoutRef.current);
+        }
+        
+        // Ajouter un délai avant le refetch pour éviter de surcharger le serveur
+        refetchTimeoutRef.current = setTimeout(() => {
+          refetch()
+            .catch(err => {
+              console.error('Erreur lors du refetch après notification:', err);
+              // Réessayer après un délai plus long en cas d'échec
+              setTimeout(refetch, 5000);
+            });
+        }, 1000); // Attendre 1 seconde avant de refetch
+      };
+
+      eventSource.onerror = (error) => {
+        console.error('Erreur SSE:', error);
+        // Fermer la connexion en cas d'erreur
+        eventSource.close();
+        // Réessayer de se connecter après un délai
+        setTimeout(setupSSE, 5000);
+      };
+    };
+    
+    // Initialiser la connexion SSE
+    setupSSE();
+    
+    return () => {
+      // Nettoyer les timeouts et la connexion SSE
+      if (refetchTimeoutRef.current) {
+        clearTimeout(refetchTimeoutRef.current);
+      }
+      if (eventSourceRef.current) {
+        console.log('Fermeture de la connexion SSE');
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);  // Supprimé refetch de la dépendance pour éviter les reconexions inutiles
 
   // Utiliser soit les résultats de recherche, soit les données complètes
   const displayData = searchResults || fetchedData;
+  
 
   const columns = [
     // ... vos colonnes restent identiques...
