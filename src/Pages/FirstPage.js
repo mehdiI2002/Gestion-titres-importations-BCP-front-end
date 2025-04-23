@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import NavBarV2 from "../HeadOfPage/NavBarV2";
 import ColumnGroupingTable from "../Table/DataTable";
 import TextFieldBar from "../CherchBar/TextField";
-
+import { useState } from 'react';
+import AppLayout from '../Layout/AppLayout';
+import { Box } from '@mui/material';
 export default function FirstPage() {
     const [searchResults, setSearchResults] = useState(null);
     
@@ -11,9 +11,10 @@ export default function FirstPage() {
         setSearchResults(results);
     };
 
-    return <>
-        <NavBarV2 />
-        <TextFieldBar onSearchResults={handleSearchResults} />
-        <ColumnGroupingTable searchResults={searchResults} />
-    </>
+    return (
+        <AppLayout>
+                <TextFieldBar onSearchResults={handleSearchResults} />
+                <ColumnGroupingTable searchResults={searchResults} />
+        </AppLayout>
+    );
 }

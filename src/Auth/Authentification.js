@@ -19,7 +19,6 @@ import { useNavigate } from 'react-router-dom';
 import { useFetchData } from '../DataFetch/FetchData'; // Importation du hook
 import { Link as RouterLink } from 'react-router-dom';
 
-
 export default function Authentification() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +30,9 @@ export default function Authentification() {
   // Initialisation du hook avec l'endpoint d'authentification et la méthode POST
   const { refetch } = useFetchData('/auth/authenticate', { method: 'POST' });
 
-  // Définition du thème personnalisé
+  // Définition du
+  // 
+  //  thème personnalisé
   const theme = createTheme({
     palette: {
       primary: {
@@ -104,8 +105,31 @@ export default function Authentification() {
       navigate('/selectTitles');
     } catch (err) {
       console.error('Erreur d\'authentification:', err);
-      setError(err.message || 'Identifiants incorrects. Veuillez réessayer.');
-    } finally {
+      
+      // Vérification complète de toutes les façons possibles d'accéder au code d'état
+      if (
+        err.status === 403 ||
+        err.statusCode === 403 ||
+        (err.response && err.response.status === 403) ||
+        (err.error && err.error.status === 403) ||
+        (typeof err === 'object' && err.toString().includes('403'))
+      ) {
+        setError('L\'email ou le mot de passe sont incorrects.');
+      } 
+      else if (
+        err.status === 503 ||
+        err.statusCode === 503 ||
+        (err.response && err.response.status === 503)
+      ) {
+        setError('Le service d\'authentification est temporairement indisponible. Veuillez réessayer plus tard.');
+      }
+      else {
+        // Message d'erreur générique pour les autres types d'erreur
+        setError('Une erreur s\'est produite lors de l\'authentification. Veuillez réessayer.');
+      }
+    }
+    finally {
+      // Cette ligne est cruciale pour réinitialiser l'état de chargement
       setLoading(false);
     }
   };
@@ -164,7 +188,7 @@ export default function Authentification() {
                   required
                   fullWidth
                   id="email"
-                  label="Adresse email @groupbcp.com"
+                  label="Adresse email"
                   name="email"
                   autoComplete="email"
                   autoFocus
@@ -238,23 +262,8 @@ export default function Authentification() {
                     </>
                   ) : "Se connecter"}
                 </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link href="#" variant="body2" sx={{ color: 'primary.main' }}>
-                      Mot de passe oublié?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-  <Link 
-    component={RouterLink} 
-    to="/register" 
-    variant="body2" 
-    sx={{ color: 'primary.main' }}
-  >
-    {"Pas de compte? S'inscrire"}
-  </Link>
-</Grid>
-                </Grid>
+                
+               
               </Box>
             </Box>
           </Paper>

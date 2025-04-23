@@ -118,20 +118,16 @@ export default function TextFieldBar({ onSearchResults }) {
     };
 
     return (
-        <Box sx={{
-            display: 'flex',
+        <Box sx={{ 
+            display: 'flex', 
             justifyContent: 'center',
             alignItems: 'center',
-            flex: 1,
-            margin: '50px',
+            maxWidth: '1000px',
+            width: '100%',
+            gap: 2,
+            margin: '20px auto',  // Réduit de 50px à 20px et centré avec 'auto'
+            flexWrap: { xs: 'wrap', md: 'nowrap' }
         }}>
-            <Box sx={{ 
-                display: 'flex', 
-                maxWidth: '1000px',
-                width: '100%',
-                gap: 2,
-                flexWrap: { xs: 'wrap', md: 'nowrap' }
-            }}>
                 <FormControl sx={{ minWidth: 200 }}>
                     <InputLabel id="search-by-label" sx={{ '&.Mui-focused': { color: '#e67900' } }}>
                         Rechercher par
@@ -208,6 +204,5 @@ export default function TextFieldBar({ onSearchResults }) {
                     {loading ? "Recherche..." : "Rechercher"}
                 </Button>
             </Box>
-        </Box>
     );
 }

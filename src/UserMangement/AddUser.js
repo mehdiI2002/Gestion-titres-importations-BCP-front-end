@@ -27,6 +27,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 // Ajoutez cet import avec les autres imports au début du fichier
 import HomeIcon from '@mui/icons-material/Home';
+import AppLayout from '../Layout/AppLayout';
 export default function AddUser() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -148,7 +149,7 @@ export default function AddUser() {
 
   return (
     <ThemeProvider theme={theme}>
-      <NavBarV2 />
+    <AppLayout>
       <Box
         sx={{
           display: 'flex',
@@ -159,22 +160,7 @@ export default function AddUser() {
         }}
       >
         {/* Fil d'Ariane */}
-        <Container maxWidth="lg" sx={{ mb: 3 }}>
-          <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/selectTitles" sx={{ display: 'flex', alignItems: 'center' }}>
-         <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-          Accueil
-          </Link>
-            <Link color="inherit" href="/admin/users" sx={{ display: 'flex', alignItems: 'center' }}>
-              <AdminPanelSettingsIcon sx={{ mr: 0.5 }} fontSize="small" />
-              Administration des Utilisateurs
-            </Link>
-            <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
-              <PersonAddIcon sx={{ mr: 0.5 }} fontSize="small" />
-              Créer un Utilisateur
-            </Typography>
-          </Breadcrumbs>
-        </Container>
+      
 
         <Container component="main" maxWidth="md">
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
@@ -333,6 +319,7 @@ export default function AddUser() {
           </Paper>
         </Container>
       </Box>
+      </AppLayout>
     </ThemeProvider>
   );
 }

@@ -7,7 +7,9 @@ import Register from '../Auth/Register';
 import Users from '../UserMangement/ListUsers';
 import EditUser from '../UserMangement/EditFormUser';
 import AddUser from '../UserMangement/AddUser';
-
+import HistoriquePage from '../Historique/HistoriquePage';
+import HistoriquePageDetailsTitle from '../Historique/HistoriquePageDetailsTittle';
+import StatistiquePage from '../Statistique/StatistiquePage.js';
  export default function Routing() {
   return (
     <BrowserRouter>
@@ -19,6 +21,9 @@ import AddUser from '../UserMangement/AddUser';
         <Route path = "/admin/users" element = {<Users />}></Route>
         <Route path = "/admin/editeFormUser/:userEmail" element = {<EditUser />}></Route>
         <Route path = "/admin/addUser" element = {<AddUser />}></Route>
+        <Route path = "/historique" element = {<HistoriquePage />}></Route>
+        <Route path="/details/titles/historique/:id/:numeroMessage" element={<HistoriquePageDetailsTitle />}/>
+        <Route path="/statistiques" element={<StatistiquePage />} />
         </Routes>
     </BrowserRouter>
   );

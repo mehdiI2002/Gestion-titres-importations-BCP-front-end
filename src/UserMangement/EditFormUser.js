@@ -25,6 +25,7 @@ import { Breadcrumbs, Link as MuiLink } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import HomeIcon from '@mui/icons-material/Home';
 import EditIcon from '@mui/icons-material/Edit';
+import AppLayout from '../Layout/AppLayout';
 
 
 export default function EditFormUser() {
@@ -177,33 +178,8 @@ export default function EditFormUser() {
 
   return (
     <ThemeProvider theme={theme}>
-      <NavBarV2 />
-      <Container maxWidth="xl" sx={{ mt: 2, mb: 1 }}>
-    <Breadcrumbs aria-label="breadcrumb" separator="›" sx={{ py: 1.5 }}>
-      <MuiLink 
-        color="inherit" 
-        href="/selectTitles" 
-        sx={{ display: 'flex', alignItems: 'center', fontWeight: 500 }}
-        underline="always"
-      >
-        <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-        Accueil
-      </MuiLink>
-      <MuiLink 
-        color="inherit" 
-        href="/admin/users" 
-        sx={{ display: 'flex', alignItems: 'center', fontWeight: 500 }}
-        underline="always"
-      >
-        <AdminPanelSettingsIcon sx={{ mr: 0.5 }} fontSize="small" />
-        Administration des Utilisateurs
-      </MuiLink>
-      <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-  <EditIcon sx={{ mr: 0.5 }} fontSize="small" />
-  Modifier l'utilisateur
-</Typography>
-    </Breadcrumbs>
-  </Container>
+      <AppLayout>
+   
       <Box
         sx={{
           display: 'flex',
@@ -409,6 +385,7 @@ export default function EditFormUser() {
           </Paper>
         </Container>
       </Box>
+      </AppLayout>
     </ThemeProvider>
   );
 }
