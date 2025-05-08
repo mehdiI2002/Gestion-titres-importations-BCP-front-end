@@ -9,7 +9,16 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { Typography, Paper, Box, CircularProgress } from '@mui/material';
+import { 
+  Typography, 
+  Paper, 
+  Box, 
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
+} from '@mui/material';
 import AppLayout from '../Layout/AppLayout';
 import { useFetchData } from '../DataFetch/FetchData';
 
@@ -17,11 +26,52 @@ import { useFetchData } from '../DataFetch/FetchData';
 const monthsOrder = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
 export default function StatistiquePage() {
+  // État pour les données filtrées à afficher dans le graphique
   const [chartData, setChartData] = useState([]);
+  // État pour stocker toutes les données reçues de l'API
+  const [allData, setAllData] = useState([]);
+  // État pour les années disponibles dans les données
+  const [availableYears, setAvailableYears] = useState([]);
+  // État pour l'année actuellement sélectionnée
+  const [selectedYear, setSelectedYear] = useState(null);
   const [requestSent, setRequestSent] = useState(false);
+  
+  // Utilisation du hook personnalisé pour l'appel API
   const { refetch, loading, error } = useFetchData('/titles/count-by-month');
 
-  // Un seul useEffect avec un flag pour garantir un seul appel
+  // Fonction pour extraire les années disponibles des données
+  const extractYears = (data) => {
+    if (!data || !Array.isArray(data) || data.length === 0) return [];
+    
+    // Extraire toutes les années uniques et les trier
+    const years = [...new Set(data.map(item => item.year))];
+    return years.sort((a, b) => b - a); // Tri décroissant pour avoir l'année la plus récente en premier
+  };
+
+  // Fonction pour filtrer les données par année
+  const filterDataByYear = (data, year) => {
+    if (!data || !Array.isArray(data) || !year) return [];
+    
+    // Filtrer les données pour l'année sélectionnée
+    const filteredByYear = data.filter(item => item.year === year);
+    
+    // Créer un tableau complet avec tous les mois, même ceux sans données
+    const complete = monthsOrder.map(month => {
+      const found = filteredByYear.find(item => item.month.toLowerCase() === month.toLowerCase());
+      return found ? found : { month, year, fileCount: 0 };
+    }).filter(item => item.fileCount > 0); // Ne garder que les mois avec des fichiers
+    
+    return complete;
+  };
+
+  // Gestionnaire de changement d'année
+  const handleYearChange = (event) => {
+    const year = event.target.value;
+    setSelectedYear(year);
+    setChartData(filterDataByYear(allData, year));
+  };
+
+  // Effet pour charger les données une seule fois
   useEffect(() => {
     const fetchStatistics = async () => {
       if (requestSent) return;
@@ -30,44 +80,63 @@ export default function StatistiquePage() {
       try {
         const data = await refetch();
         
-        // Traitement des données
-        if (data && data.length > 0) {
-          const orderedData = monthsOrder
-            .map(month => {
-              const found = data.find(item => item.month.toLowerCase() === month);
-              return found ? found : { month, fileCount: 0 };
-            })
-            .filter(item => item.fileCount > 0);
+        // Vérification des données
+        if (data && Array.isArray(data) && data.length > 0) {
+          console.log("Données reçues:", data);
+          setAllData(data);
           
-          setChartData(orderedData);
+          // Extraire les années disponibles
+          const years = extractYears(data);
+          setAvailableYears(years);
+          
+          // Sélectionner l'année la plus récente par défaut
+          if (years.length > 0) {
+            const latestYear = years[0]; // La première année est la plus récente (après tri)
+            setSelectedYear(latestYear);
+            setChartData(filterDataByYear(data, latestYear));
+          }
         } else if (process.env.NODE_ENV === 'development') {
-          // Données de démo pour le développement
-          setChartData([
-            { month: "janvier", fileCount: 1 },
-            { month: "février", fileCount: 1 },
-            { month: "mars", fileCount: 1 },
-            { month: "avril", fileCount: 11 },
-            { month: "juin", fileCount: 1 }
-          ]);
+          // Données de démo en cas d'absence de données
+          const mockData = [
+            { month: "avril", year: 2025, fileCount: 17 },
+            { month: "avril", year: 2024, fileCount: 1 },
+            { month: "mars", year: 2024, fileCount: 1 }
+          ];
+          
+          setAllData(mockData);
+          const years = extractYears(mockData);
+          setAvailableYears(years);
+          
+          if (years.length > 0) {
+            setSelectedYear(years[0]);
+            setChartData(filterDataByYear(mockData, years[0]));
+          }
         }
       } catch (err) {
         console.error("Erreur lors de la récupération des statistiques:", err);
         
-        // En mode développement, charger des données de démonstration même en cas d'erreur
+        // Données de démo en cas d'erreur
         if (process.env.NODE_ENV === 'development') {
-          setChartData([
-            { month: "janvier", fileCount: 1 },
-            { month: "février", fileCount: 1 },
-            { month: "mars", fileCount: 1 },
-            { month: "avril", fileCount: 11 },
-            { month: "juin", fileCount: 1 }
-          ]);
+          const mockData = [
+            { month: "avril", year: 2025, fileCount: 17 },
+            { month: "avril", year: 2024, fileCount: 1 },
+            { month: "mars", year: 2024, fileCount: 1 }
+          ];
+          
+          setAllData(mockData);
+          const years = extractYears(mockData);
+          setAvailableYears(years);
+          
+          if (years.length > 0) {
+            setSelectedYear(years[0]);
+            setChartData(filterDataByYear(mockData, years[0]));
+          }
         }
       }
     };
     
     fetchStatistics();
-  }, []); // Dépendances vides = exécution unique au montage
+  }, []);
 
   // Tooltip personnalisé
   const CustomTooltip = ({ active, payload, label }) => {
@@ -79,7 +148,7 @@ export default function StatistiquePage() {
           border: '1px solid #ccc',
           borderRadius: '4px' 
         }}>
-          <p style={{ margin: 0 }}><b>{label}</b></p>
+          <p style={{ margin: 0 }}><b>{label} {selectedYear}</b></p>
           <p style={{ margin: 0, color: '#e67900' }}>
             {`${payload[0].value} fichier${payload[0].value > 1 ? 's' : ''}`}
           </p>
@@ -97,9 +166,69 @@ export default function StatistiquePage() {
         </Typography>
 
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#e67900', mb: 2 }}>
-            Nombre de fichiers traités par mois
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#e67900' }}>
+            Nombre de fichiers reçus par mois
+            </Typography>
+            
+            {availableYears.length > 0 && (
+              <FormControl 
+                variant="outlined" 
+                size="small" 
+                sx={{ 
+                  minWidth: 120,
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#e67900', // bordure orange au focus
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#e67900', // bordure orange au survol
+                    }
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#e67900', // Label orange au focus
+                  },
+                  '& .MuiSelect-icon': {
+                    color: '#e67900', // Icône de la flèche en orange
+                  }
+                }}
+              >
+                <InputLabel id="year-select-label">Année</InputLabel>
+                <Select
+                  labelId="year-select-label"
+                  id="year-select"
+                  value={selectedYear}
+                  onChange={handleYearChange}
+                  label="Année"
+                  sx={{
+                    '&.Mui-focused': {
+                      color: '#e67900', // Texte orange quand sélectionné
+                    }
+                  }}
+                >
+                  {availableYears.map(year => (
+                    <MenuItem 
+                      key={year} 
+                      value={year}
+                      sx={{
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgba(230, 121, 0, 0.1)', // Fond orange clair pour l'élément sélectionné
+                          '&:hover': {
+                            backgroundColor: 'rgba(230, 121, 0, 0.2)', // Fond orange plus foncé au survol
+                          }
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(230, 121, 0, 0.05)', // Léger fond orange au survol
+                        }
+                      }}
+                    >
+                      {year}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Box>
           
           {loading && !chartData.length ? (
             <Box display="flex" justifyContent="center" alignItems="center" height="400px">
@@ -144,7 +273,7 @@ export default function StatistiquePage() {
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ bottom: 0 }} />
                 <Bar 
-                  name="Nombre de fichiers" 
+                  name={`Nombre de fichiers (${selectedYear})`}
                   dataKey="fileCount" 
                   fill="#e67900" 
                   barSize={60}
@@ -154,7 +283,7 @@ export default function StatistiquePage() {
             </ResponsiveContainer>
           ) : (
             <Typography align="center" variant="body1" sx={{ py: 10 }}>
-              Aucune donnée disponible pour la période sélectionnée.
+              Aucune donnée disponible pour l'année {selectedYear}.
             </Typography>
           )}
         </Paper>
