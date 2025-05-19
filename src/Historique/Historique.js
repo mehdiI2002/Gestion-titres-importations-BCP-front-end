@@ -15,7 +15,7 @@ import { useFetchData } from '../DataFetch/FetchData';
 import Typography from '@mui/material/Typography';
 export default function HistoriqueTable({ searchResults }) {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
   // Endpoint modifié pour l'historique
   const { data: fetchedData, loading, error, refetch } = useFetchData('/titles/historique');
   const navigate = useNavigate();
@@ -183,6 +183,8 @@ export default function HistoriqueTable({ searchResults }) {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="ligne par page"
+
       />
     </Paper>
   );

@@ -15,7 +15,7 @@ import { useFetchData } from '../DataFetch/FetchData';
 
 export default function ColumnGroupingTable({ searchResults }) {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
   const { data: fetchedData, loading, error, refetch } = useFetchData('/titles/selectTittles');
   const navigate = useNavigate();
   const eventSourceRef = useRef(null);

@@ -9,7 +9,7 @@ const drawerWidth = 280;
 const closedDrawerWidth = 70;
 
 export default function AppLayout({ children }) {
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [userSession, setUserSession] = useState(null);
   const navigate = useNavigate();
 

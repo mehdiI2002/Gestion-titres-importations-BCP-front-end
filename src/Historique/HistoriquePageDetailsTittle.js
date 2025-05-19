@@ -15,6 +15,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import HistoryIcon from '@mui/icons-material/History';
 import DescriptionIcon from '@mui/icons-material/Description';
 import Box from '@mui/material/Box';
+import AppLayout from '../Layout/AppLayout';
 
 export default function PageDetailsTitleHistorique() {
     const { id, numeroMessage } = useParams();
@@ -24,61 +25,20 @@ export default function PageDetailsTitleHistorique() {
         fetchData.refetch();
     }, []);
     
-    return <>
-        <NavBarV2 />
-        {/* Fil d'Ariane (Breadcrumbs) */}
-        <Box sx={{ px: 3, pt: 2 }}>
-            <Breadcrumbs aria-label="breadcrumb" separator="›" sx={{ py: 1.5 }}>
-                <Link 
-                    color="inherit" 
-                    component={RouterLink}
-                    to="/selectTitles" 
-                    sx={{ display: 'flex', alignItems: 'center', fontWeight: 500,
-                        '&:hover': {
-                            textDecoration: 'underline',
-                            color: '#e67900'
-                        }
-                     }}
-                    underline="hover"
-                >
-                    <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-                    Accueil
-                </Link>
-                <Link 
-                    color="inherit" 
-                    component={RouterLink}
-                    to="/historique" 
-                    sx={{ display: 'flex', alignItems: 'center', fontWeight: 500 , '&:hover': {
-                        textDecoration: 'underline',
-                        color: '#e67900'
-                    }}}
-                   
-                >
-                    <HistoryIcon sx={{ mr: 0.5 }} fontSize="small" />
-                    Historique
-                </Link>
-                <Link 
-                    color="text.primary"
-                    sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        fontWeight: 600,
-                        pointerEvents: 'none'
-                    }}
-                    underline="none"
-                >
-                    <DescriptionIcon sx={{ mr: 0.5 }} fontSize="small" />
-                    Détails du titre {id}
-                </Link>
-            </Breadcrumbs>
-        </Box>
-        
-        {/* Contenu existant */}
-        <DetailsTableMessage useFetch={fetchData} id={id} />
-        <DetailsTableOperator useFetch={fetchData} id={id} />
-        <DetailsTableBank useFetch={fetchData} id={id} /> 
-        <DetailsTableMarchandise useFetch={fetchData} id={id} />
-        <DetailsTableTitle useFetch={fetchData} id={id} />
-        <PDF useFetch={fetchData} />
-    </>
+    return (
+        <AppLayout>
+            {/* NavBarV2 n'est plus nécessaire ici, il est déjà inclus dans AppLayout */}
+            {/* Fil d'Ariane (Breadcrumbs) peut être ajouté ici si besoin */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+                <DetailsTableMessage useFetch={fetchData} id={id} />
+                <DetailsTableOperator useFetch={fetchData} id={id} />
+                <DetailsTableBank useFetch={fetchData} id={id} />
+                <DetailsTableMarchandise useFetch={fetchData} id={id} />
+            </Box>
+            <Box sx={{ width: '100%', mb: 3 }}>
+                <DetailsTableTitle useFetch={fetchData} id={id} />
+            </Box>
+            <PDF useFetch={fetchData} />
+        </AppLayout>
+    );
 }

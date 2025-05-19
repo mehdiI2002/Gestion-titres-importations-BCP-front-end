@@ -16,6 +16,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import Box from '@mui/material/Box';
 import { Link as RouterLink } from 'react-router-dom';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AppLayout from '../Layout/AppLayout';
 
 export default function PageTwo() {
     const { id, numeroMessage } = useParams();
@@ -24,46 +25,20 @@ export default function PageTwo() {
         fetchData.refetch();
       }, []);
     return <>
-    <NavBarV2 />{/* Fil d'Ariane (Breadcrumbs) */}
-        <Box sx={{ px: 3, pt: 2 }}>
-            <Breadcrumbs aria-label="breadcrumb" separator="›" sx={{ py: 1.5 }}>
-                <Link 
-                    color="inherit" 
-                    component={RouterLink}
-                    to="/selectTitles" 
-                    sx={{ display: 'flex', alignItems: 'center', fontWeight: 500,
-                        '&:hover': {
-                            textDecoration: 'underline',
-                            color: '#e67900'
-                        }
-                     }}
-                    underline="hover"
-                >
-                    <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-                    Accueil
-                </Link>
-            
-                <Link 
-                    color="text.primary"
-                    sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        fontWeight: 600,
-                        pointerEvents: 'none'
-                    }}
-                    underline="none"
-                >
-                    <DescriptionIcon sx={{ mr: 0.5 }} fontSize="small" />
-                    Détails du titre {id}
-                </Link>
-            </Breadcrumbs>
-        </Box>
+    <AppLayout>
+    
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
         <DetailsTableMessage useFetch={fetchData} id={id} />
         <DetailsTableOperator useFetch={fetchData} id={id} />
         <DetailsTableBank useFetch={fetchData} id={id} /> 
         <DetailsTableMarchandise useFetch={fetchData} id={id} />
-        <DetailsTableTitle useFetch={fetchData} id={id} />
-        <PDF useFetch={fetchData} /> 
+        </Box>
+        
+    <Box sx={{ width: '100%', mb: 3 }}>
+                <DetailsTableTitle useFetch={fetchData} id={id} />
+        </Box> 
+    <PDF useFetch={fetchData} /> 
         <ButtonContainer  numeroMessage = {numeroMessage}/> 
+        </AppLayout>
     </>
 }
